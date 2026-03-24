@@ -82,6 +82,64 @@ Backups can be automatically synced to Google Drive (or any [rclone remote](http
 
 Backups sync automatically on the nightly schedule. Failures are reported via email if notifications are configured.
 
+## Email notifications
+
+Get notified when a backup fails, an update fails, or the server can't start. Requires a mail transport agent on the server — `msmtp` is recommended.
+
+1. Install msmtp:
+   ```bash
+   sudo apt-get install msmtp msmtp-mta
+   ```
+
+2. Configure msmtp (e.g. with Gmail SMTP). Create `/etc/msmtprc`:
+   ```
+   account default
+   host smtp.gmail.com
+   port 587
+   tls on
+   auth on
+   user your-email@gmail.com
+   password your-app-password
+   from your-email@gmail.com
+   ```
+   ```bash
+   sudo chmod 600 /etc/msmtprc
+   ```
+   For Gmail, use an [App Password](https://support.google.com/accounts/answer/185833) (not your regular password).
+
+3. Enable notifications in `config.env`:
+   ```bash
+   NOTIFY_ENABLED=true
+   NOTIFY_EMAIL="your-email@gmail.com"
+   ```
+
+4. Test it:
+   ```bash
+   echo "Test notification" | msmtp your-email@gmail.com
+   ```
+
+The scripts also support `sendmail` or `mail` if already configured on the system.
+
+## Logs
+
+Server and management logs are in `INSTALL_DIR/logs/`:
+
+```bash
+# Live server output
+tail -f /opt/minecraft-bedrock/logs/server.log
+
+# Backup history
+tail -f /opt/minecraft-bedrock/logs/backup.log
+
+# Update history
+tail -f /opt/minecraft-bedrock/logs/update.log
+
+# Systemd journal
+journalctl -u minecraft -f
+```
+
+Logs are preserved across server updates.
+
 ## Managing the server
 
 ```bash
