@@ -28,7 +28,7 @@ TIMESTAMP="${TIMESTAMP%.zip}"
 PROPERTIES_BACKUP="${BACKUP_DIR}/server.properties.${TIMESTAMP}"
 
 log_info "Stopping Minecraft server"
-"${SCRIPT_DIR}/stop.sh" || {
+sudo systemctl stop minecraft 2>/dev/null || {
   log_warn "Server may not have been running"
 }
 sleep 2
@@ -83,6 +83,6 @@ else
 fi
 
 log_info "Starting Minecraft server"
-"${SCRIPT_DIR}/start.sh"
+sudo systemctl start minecraft
 
 log_info "Restore complete"
