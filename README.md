@@ -25,11 +25,23 @@ curl -sLO "https://github.com/heinx/minecraft-home-server/releases/download/${VE
 Each release package is built from a git tag by GitHub Actions. You can verify that the package is authentic and inspect what's in it before installing:
 
 ```bash
-# Verify build attestation (proves the package was built by this repo's CI)
 gh attestation verify "minecraft-home-server-${VERSION}.tar.gz" --repo heinx/minecraft-home-server
 ```
 
-You can inspect the exact source code for any release tag on GitHub:
+A successful verification looks like:
+
+```
+Loaded digest sha256:abc123... for file minecraft-home-server-v1.0.0.tar.gz
+Loaded 1 attestation from GitHub API
+✓ Verification succeeded!
+
+   - Predicate type: https://slsa.dev/provenance/v1
+   - Signer:         https://github.com/heinx/minecraft-home-server/.github/workflows/release.yml@refs/tags/v1.0.0
+   - Build trigger:  push
+   - Source:         https://github.com/heinx/minecraft-home-server
+```
+
+The **Signer** field confirms the package was built by this repo's release workflow at the exact tag version. You can inspect the source code for any tag on GitHub:
 `https://github.com/heinx/minecraft-home-server/tree/<version>`
 
 ### Install
