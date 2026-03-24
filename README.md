@@ -41,7 +41,7 @@ gh attestation verify "minecraft-home-server-${VERSION}.tar.gz" --repo heinx/min
 - Runs Bedrock Dedicated Server as a systemd service (auto-start on boot, auto-restart on crash)
 - Nightly world backups with configurable retention (default: 20)
 - Optional offsite backup to Google Drive (or any rclone remote)
-- Automatic server updates from Microsoft's download API
+- Automatic server updates via [Microsoft's Minecraft services API](https://net-secondary.web.minecraft-services.net/api/v1.0/download/links) (`minecraft-services.net` — Microsoft-owned Azure infrastructure)
 - Email notifications on failures (update, backup, or server crash)
 
 ## Import an existing world
