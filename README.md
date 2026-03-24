@@ -63,7 +63,7 @@ sudo ./install.sh --config /path/to/config.env
 - Runs Bedrock Dedicated Server as a systemd service (auto-start on boot, auto-restart on crash)
 - Nightly world backups with configurable retention (default: 20)
 - Optional offsite backup to Google Drive (or any rclone remote)
-- Automatic server updates via [Microsoft's Minecraft services API](https://net-secondary.web.minecraft-services.net/api/v1.0/download/links) (`minecraft-services.net` — Microsoft-owned Azure infrastructure)
+- Automatic server updates via [Microsoft's Minecraft services API](https://net-secondary.web.minecraft-services.net/api/v1.0/download/links) (`minecraft-services.net` — registered to Microsoft Corporation, TLS certificate issued by Microsoft CA)
 - Email notifications on failures (update, backup, or server crash)
 
 ## Import an existing world
