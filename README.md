@@ -15,8 +15,10 @@ Optional: `jq` (better update URL parsing), `rclone` (offsite backups), `msmtp` 
 ## Quick Install
 
 ```bash
-curl -sL https://github.com/heinx/minecraft-home-server/releases/latest/download/minecraft-home-server.tar.gz | tar xz
-cd minecraft-home-server
+# Replace v1.0.0 with the desired version
+VERSION=v1.0.0
+curl -sL "https://github.com/heinx/minecraft-home-server/releases/download/${VERSION}/minecraft-home-server-${VERSION}.tar.gz" | tar xz
+cd "minecraft-home-server-${VERSION}"
 sudo ./install.sh
 ```
 
@@ -31,7 +33,7 @@ sudo ./install.sh --config /path/to/config.env
 This step ensures the package is authentic and has been built by the trusted source:
 
 ```bash
-gh attestation verify minecraft-home-server.tar.gz --repo heinx/minecraft-home-server
+gh attestation verify "minecraft-home-server-${VERSION}.tar.gz" --repo heinx/minecraft-home-server
 ```
 
 ## What it does
