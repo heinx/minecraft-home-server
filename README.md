@@ -17,7 +17,28 @@ Optional: `jq` (better update URL parsing), `rclone` (offsite backups), `msmtp` 
 ```bash
 # Replace v1.0.0 with the desired version
 VERSION=v1.0.0
-curl -sL "https://github.com/heinx/minecraft-home-server/releases/download/${VERSION}/minecraft-home-server-${VERSION}.tar.gz" | tar xz
+curl -sLO "https://github.com/heinx/minecraft-home-server/releases/download/${VERSION}/minecraft-home-server-${VERSION}.tar.gz"
+```
+
+### Verify the download
+
+Each release package is built from a git tag by GitHub Actions. You can verify that the package is authentic and inspect what's in it before installing:
+
+```bash
+# Verify build attestation (proves the package was built by this repo's CI)
+gh attestation verify "minecraft-home-server-${VERSION}.tar.gz" --repo heinx/minecraft-home-server
+
+# Inspect the corresponding git tag to see exactly what source code was packaged
+git clone https://github.com/heinx/minecraft-home-server.git
+cd minecraft-home-server
+git checkout "$VERSION"
+git log --oneline -5
+```
+
+### Install
+
+```bash
+tar xzf "minecraft-home-server-${VERSION}.tar.gz"
 cd "minecraft-home-server-${VERSION}"
 sudo ./install.sh
 ```
@@ -26,14 +47,6 @@ The installer prompts for server name, world name, ports, etc. For non-interacti
 
 ```bash
 sudo ./install.sh --config /path/to/config.env
-```
-
-### Verify the download (optional)
-
-This step ensures the package is authentic and has been built by the trusted source:
-
-```bash
-gh attestation verify "minecraft-home-server-${VERSION}.tar.gz" --repo heinx/minecraft-home-server
 ```
 
 ## What it does
