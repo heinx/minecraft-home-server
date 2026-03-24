@@ -53,6 +53,35 @@ IMPORT_WORLD="/path/to/your/world"           # directory or .zip
 IMPORT_SERVER_PROPERTIES="/path/to/server.properties"  # optional
 ```
 
+## Offsite backup to Google Drive
+
+Backups can be automatically synced to Google Drive (or any [rclone remote](https://rclone.org/overview/)) for protection against disk failure.
+
+1. Install rclone:
+   ```bash
+   curl -sfL https://rclone.org/install.sh | sudo bash
+   ```
+
+2. Configure a Google Drive remote (run as the minecraft service user):
+   ```bash
+   sudo -u minecraft rclone config
+   ```
+   Follow the prompts: choose `drive` as the storage type, name it e.g. `gdrive`, and complete the OAuth flow. See [rclone Google Drive docs](https://rclone.org/drive/) for details.
+
+3. Enable offsite backup in `config.env`:
+   ```bash
+   OFFSITE_BACKUP_ENABLED=true
+   OFFSITE_BACKUP_REMOTE="gdrive:minecraft-backups"
+   ```
+
+4. Test it manually:
+   ```bash
+   sudo -u minecraft /opt/minecraft-bedrock/scripts/backup.sh
+   rclone ls gdrive:minecraft-backups
+   ```
+
+Backups sync automatically on the nightly schedule. Failures are reported via email if notifications are configured.
+
 ## Managing the server
 
 ```bash
