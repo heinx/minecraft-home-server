@@ -27,13 +27,10 @@ Each release package is built from a git tag by GitHub Actions. You can verify t
 ```bash
 # Verify build attestation (proves the package was built by this repo's CI)
 gh attestation verify "minecraft-home-server-${VERSION}.tar.gz" --repo heinx/minecraft-home-server
-
-# Inspect the corresponding git tag to see exactly what source code was packaged
-git clone https://github.com/heinx/minecraft-home-server.git
-cd minecraft-home-server
-git checkout "$VERSION"
-git log --oneline -5
 ```
+
+You can inspect the exact source code for any release tag on GitHub:
+`https://github.com/heinx/minecraft-home-server/tree/<version>`
 
 ### Install
 
