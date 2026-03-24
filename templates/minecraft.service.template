@@ -1,0 +1,19 @@
+# Managed by minecraft-home-server - do not edit directly
+[Unit]
+Description=Minecraft Bedrock Server
+Wants=network-online.target
+After=network-online.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=forking
+User=%%SERVICE_USER%%
+Group=%%SERVICE_GROUP%%
+Restart=always
+ExecStart=/usr/bin/bash %%INSTALL_DIR%%/scripts/start.sh
+ExecStop=/usr/bin/bash %%INSTALL_DIR%%/scripts/stop.sh
+WorkingDirectory=%%INSTALL_DIR%%
+TimeoutStartSec=600
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,3 @@
+# Managed by minecraft-home-server - do not edit directly
+%%BACKUP_CRON%% %%INSTALL_DIR%%/scripts/backup.sh >> %%INSTALL_DIR%%/logs/backup.log 2>&1
+%%UPDATE_CRON%% %%INSTALL_DIR%%/scripts/update.sh >> %%INSTALL_DIR%%/logs/update.log 2>&1

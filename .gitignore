@@ -1,0 +1,22 @@
+# Minecraft server binaries and archives
+*.zip
+*.debug
+bedrock_server
+
+# World data (large LevelDB files)
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+
+# Runtime config (contains user-specific settings)
+config.env
+
+# IDE
+.vscode/
+.idea/
+
+# Vagrant
+.vagrant/
