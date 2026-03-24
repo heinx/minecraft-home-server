@@ -1,0 +1,21 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "generic/ubuntu2204"
+
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = 2048
+    vb.cpus = 2
+    vb.name = "minecraft-bedrock-tests"
+  end
+
+  # Sync repo root into the VM
+  config.vm.synced_folder "..", "/vagrant"
+
+  # Forward Bedrock server UDP port for manual verification
+  config.vm.network "forwarded_port", guest: 19132, host: 19132, protocol: "udp"
+
+  # Provision the VM
+  config.vm.provision "shell", path: "provision.sh"
+end

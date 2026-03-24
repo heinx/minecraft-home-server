@@ -50,7 +50,7 @@ curl -sf -o "${INSTALL_DIR}/${FILENAME}" "$DOWNLOAD_URL" || {
 }
 
 log_info "Stopping Minecraft service"
-if ! systemctl stop minecraft; then
+if ! sudo systemctl stop minecraft; then
   log_error "Failed to stop minecraft service"
   send_notification "Minecraft Update Failed" "Could not stop minecraft service"
   exit 1
@@ -67,7 +67,7 @@ if ! unzip -o "${INSTALL_DIR}/${FILENAME}" -d "${INSTALL_DIR}"; then
   mv "${INSTALL_DIR}/server.properties.pre-update" "${INSTALL_DIR}/server.properties" 2>/dev/null || true
   mv "${INSTALL_DIR}/config.env.pre-update" "${INSTALL_DIR}/config.env" 2>/dev/null || true
   send_notification "Minecraft Update Failed" "Extraction of ${FILENAME} failed"
-  systemctl start minecraft || true
+  sudo systemctl start minecraft || true
   exit 1
 fi
 
@@ -76,7 +76,7 @@ mv "${INSTALL_DIR}/server.properties.pre-update" "${INSTALL_DIR}/server.properti
 mv "${INSTALL_DIR}/config.env.pre-update" "${INSTALL_DIR}/config.env" 2>/dev/null || true
 
 log_info "Starting Minecraft service"
-if ! systemctl start minecraft; then
+if ! sudo systemctl start minecraft; then
   log_error "Failed to start minecraft service after update"
   send_notification "Minecraft Update Failed" "Server did not start after updating to ${FILENAME}"
   exit 1

@@ -194,6 +194,15 @@ if ! getent group "$SERVICE_GROUP" &>/dev/null; then
   groupadd --system "$SERVICE_GROUP"
 fi
 
+# Allow service user to start/stop the minecraft service without a password
+SUDOERS_FILE="/etc/sudoers.d/minecraft"
+log_info "Configuring sudoers for ${SERVICE_USER}"
+cat > "$SUDOERS_FILE" <<SUDOEOF
+# Allow the minecraft service user to manage the systemd service
+${SERVICE_USER} ALL=(ALL) NOPASSWD: /usr/bin/systemctl stop minecraft, /usr/bin/systemctl start minecraft, /usr/bin/systemctl restart minecraft
+SUDOEOF
+chmod 0440 "$SUDOERS_FILE"
+
 # --- Step 2: Create directories ---
 
 log_info "Creating directories"
