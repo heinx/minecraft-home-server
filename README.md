@@ -2,6 +2,16 @@
 
 Easy-to-install Minecraft Bedrock Dedicated Server for home Linux (Ubuntu) servers. Runs reliably with automatic updates, backups, and monitoring.
 
+## Prerequisites
+
+Ubuntu server with:
+
+```bash
+sudo apt-get install curl unzip zip screen
+```
+
+Optional: `jq` (better update URL parsing), `rclone` (offsite backups), `msmtp` (email notifications).
+
 ## Quick Install
 
 ```bash
@@ -17,6 +27,8 @@ sudo ./install.sh --config /path/to/config.env
 ```
 
 ### Verify the download (optional)
+
+This step ensures the package is authentic and has been built by the trusted source:
 
 ```bash
 gh attestation verify minecraft-home-server.tar.gz --repo heinx/minecraft-home-server

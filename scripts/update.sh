@@ -43,7 +43,7 @@ if [[ -f "${INSTALL_DIR}/${FILENAME}" ]]; then
 fi
 
 log_info "Update available. Downloading ${DOWNLOAD_URL}"
-curl -sf -o "${INSTALL_DIR}/${FILENAME}" "$DOWNLOAD_URL" || {
+curl -sfL -A "Mozilla/5.0" -o "${INSTALL_DIR}/${FILENAME}" "$DOWNLOAD_URL" || {
   log_error "Failed to download ${DOWNLOAD_URL}"
   send_notification "Minecraft Update Failed" "Download failed: ${DOWNLOAD_URL}"
   exit 1

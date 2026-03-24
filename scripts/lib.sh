@@ -70,7 +70,7 @@ ${body}"
 
 check_dependencies() {
   local missing=()
-  for cmd in screen unzip curl; do
+  for cmd in screen unzip zip curl; do
     if ! command -v "$cmd" &>/dev/null; then
       missing+=("$cmd")
     fi

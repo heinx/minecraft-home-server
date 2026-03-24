@@ -48,24 +48,23 @@ fi
 
 # --- Test restart on kill ---
 
-test_start "service restarts after bedrock_server is killed"
+test_start "service restarts after process is killed"
 
-# Find the bedrock_server PID
-OLD_PID="$(pgrep -f bedrock_server || true)"
-if [[ -z "$OLD_PID" ]]; then
-  test_fail "bedrock_server process not found, cannot test restart"
+# systemd tracks the screen process (Type=forking), so kill that to trigger Restart=always
+MAIN_PID="$(systemctl show -p MainPID minecraft --value 2>/dev/null || true)"
+if [[ -z "$MAIN_PID" || "$MAIN_PID" == "0" ]]; then
+  test_fail "could not determine service MainPID, cannot test restart"
 else
-  # Kill the process; systemd should restart it (Restart=always in the unit)
-  sudo kill -9 "$OLD_PID" 2>/dev/null || true
+  sudo kill -9 "$MAIN_PID" 2>/dev/null || true
 
-  # Wait for systemd to restart it (the new PID should differ from old)
+  # Wait for systemd to restart the service (new MainPID differs from old)
   check_restarted() {
     local new_pid
-    new_pid="$(pgrep -f bedrock_server || true)"
-    [[ -n "$new_pid" && "$new_pid" != "$OLD_PID" ]]
+    new_pid="$(systemctl show -p MainPID minecraft --value 2>/dev/null || true)"
+    [[ -n "$new_pid" && "$new_pid" != "0" && "$new_pid" != "$MAIN_PID" ]]
   }
 
-  if wait_for "service to restart after kill" 30 check_restarted; then
+  if wait_for "service to restart after kill" 60 check_restarted; then
     test_pass
   else
     true

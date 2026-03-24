@@ -16,10 +16,10 @@ fi
 # --- Verify systemd service ---
 
 test_start "minecraft service is registered in systemd"
-if systemctl list-unit-files | grep -q "minecraft.service"; then
+if [[ -f /etc/systemd/system/minecraft.service ]] && systemctl is-enabled minecraft &>/dev/null; then
   test_pass
 else
-  test_fail "minecraft.service not found in systemd unit files"
+  test_fail "minecraft.service not found or not enabled"
 fi
 
 # --- Verify install directory ---

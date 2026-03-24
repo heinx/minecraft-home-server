@@ -10,7 +10,10 @@ LOG_DIR="${INSTALL_DIR}/logs"
 LOG_FILE="${LOG_DIR}/server.log"
 mkdir -p "$LOG_DIR"
 
-if screen -list | grep -q "minecraft"; then
+# Clean up dead screen sockets (e.g. after kill -9)
+screen -wipe 2>/dev/null || true
+
+if screen -list 2>/dev/null | grep -q "[0-9]\.minecraft"; then
   log_warn "Minecraft screen session already running"
   exit 1
 fi

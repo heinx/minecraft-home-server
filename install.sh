@@ -82,7 +82,7 @@ check_dependency() {
 
 log_info "Checking dependencies"
 missing=0
-for cmd in curl unzip screen; do
+for cmd in curl unzip zip screen; do
   if ! check_dependency "$cmd"; then
     missing=1
   fi
@@ -291,7 +291,7 @@ SERVER_ZIP="${DOWNLOAD_URL##*/}"
 log_info "Downloading ${DOWNLOAD_URL}"
 log_info "  -> ${INSTALL_DIR}/${SERVER_ZIP}"
 
-curl -sf -o "${INSTALL_DIR}/${SERVER_ZIP}" "$DOWNLOAD_URL" || {
+curl -sfL -A "Mozilla/5.0" -o "${INSTALL_DIR}/${SERVER_ZIP}" "$DOWNLOAD_URL" || {
   log_error "Failed to download Bedrock server"
   exit 1
 }
