@@ -15,6 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       tarball: ${{ steps.package.outputs.tarball }}
+      attested: ${{ steps.attest.outcome == 'success' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -28,6 +29,8 @@ jobs:
           echo "tarball=${TARBALL}" >> "$GITHUB_OUTPUT"
 
       - name: Attest build provenance
+        id: attest
+        continue-on-error: true
         uses: actions/attest-build-provenance@v2
         with:
           subject-path: ${{ steps.package.outputs.tarball }}
@@ -45,6 +48,7 @@ jobs:
 
   verify-attestation:
     needs: release
+    if: needs.release.outputs.attested == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Download release artifact
