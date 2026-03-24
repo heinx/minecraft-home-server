@@ -142,6 +142,32 @@ Get notified when a backup fails, an update fails, or the server can't start. Re
 
 The scripts also support `sendmail` or `mail` if already configured on the system.
 
+Example notification emails:
+
+```
+Subject: Minecraft Update Failed
+From: minecraft-server@your-hostname
+To: your-email@gmail.com
+
+Server did not start after updating to bedrock-server-1.26.10.4.zip
+```
+
+```
+Subject: Minecraft Backup Failed
+From: minecraft-server@your-hostname
+To: your-email@gmail.com
+
+Failed to zip world 'MyWorld'
+```
+
+```
+Subject: Minecraft Offsite Backup Failed
+From: minecraft-server@your-hostname
+To: your-email@gmail.com
+
+rclone sync to gdrive:minecraft-backups failed
+```
+
 ## Logs
 
 Server and management logs are in `INSTALL_DIR/logs/`:
