@@ -43,7 +43,8 @@ for f in "${BACKUP_DIR}"/${WORLD_NAME}_*.zip; do
 done
 
 if [[ -n "$latest_zip" && -f "$latest_zip" ]]; then
-  if unzip -l "$latest_zip" 2>/dev/null | grep -q "level\.dat"; then
+  zip_listing="$(unzip -l "$latest_zip" 2>/dev/null || true)"
+  if echo "$zip_listing" | grep -q "level\.dat"; then
     test_pass
   else
     test_fail "level.dat not found inside ${latest_zip}"
