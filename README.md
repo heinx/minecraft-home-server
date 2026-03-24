@@ -228,6 +228,10 @@ git tag v1.0.0
 git push origin v1.0.0
 ```
 
+## Disclaimer
+
+This project is not affiliated with Mojang or Microsoft. Minecraft is a trademark of Mojang AB. The Bedrock Dedicated Server software is downloaded directly from [minecraft.net](https://www.minecraft.net/en-us/download/server/bedrock) and is subject to the [Minecraft End User License Agreement](https://www.minecraft.net/en-us/eula).
+
 ## License
 
 MIT
