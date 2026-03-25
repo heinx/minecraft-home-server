@@ -21,9 +21,9 @@ fi
 
 # --- Verify server process is running ---
 
-test_start "bedrock_server process or screen session is running"
+test_start "bedrock_server process is running"
 check_server_running() {
-  pgrep -f bedrock_server >/dev/null 2>&1 || screen -list 2>/dev/null | grep -q minecraft
+  pgrep -x bedrock_server >/dev/null 2>&1
 }
 
 if wait_for "server process to appear" 15 check_server_running; then
@@ -43,6 +43,25 @@ check_port_listening() {
 if wait_for "port 19132/UDP to be listening" 30 check_port_listening; then
   test_pass
 else
+  true
+fi
+
+# --- Verify server started successfully via log ---
+
+test_start "bedrock_server log shows successful startup"
+LOG_FILE="${INSTALL_DIR}/logs/server.log"
+
+check_server_started_log() {
+  [[ -f "$LOG_FILE" ]] && grep -q "Server started\." "$LOG_FILE"
+}
+
+if wait_for "\"Server started.\" in log" 60 check_server_started_log; then
+  test_pass
+else
+  if [[ -f "$LOG_FILE" ]]; then
+    echo "    Last 5 lines of server.log:"
+    tail -5 "$LOG_FILE" | sed 's/^/      /'
+  fi
   true
 fi
 
