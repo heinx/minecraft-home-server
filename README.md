@@ -258,13 +258,29 @@ sudo /opt/minecraft-bedrock/scripts/restore.sh /opt/minecraft-bedrock/backups/wo
 
 ## Testing
 
-Tests run in a Vagrant VM to safely validate the full install/service/backup/update lifecycle:
+Tests run in a VM to validate the full install/service/backup/update lifecycle.
+
+### Apple Silicon Macs (Lima — recommended)
+
+Uses Apple Virtualization.framework for native arm64 boot (~20s) with Rosetta 2 for transparent x86_64 bedrock_server execution.
+
+```bash
+brew install lima
+cd tests
+make up       # Create and provision VM
+make test     # Run 28 tests
+make destroy  # Tear down
+```
+
+Use `make retest` to re-run tests without rebuilding the VM.
+
+### Intel / Linux / CI (Vagrant)
 
 ```bash
 cd tests
-vagrant up        # Provisions Ubuntu 22.04 VM and installs dependencies
+vagrant up --provider=qemu    # or virtualbox
 vagrant ssh -c "sudo /vagrant/tests/run_tests.sh"
-vagrant destroy   # Tear down
+vagrant destroy
 ```
 
 ## Releasing

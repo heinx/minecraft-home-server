@@ -1,5 +1,12 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
+#
+# Apple Silicon (M1/M2): use Lima instead — much faster (~30s vs ~10min):
+#   cd tests && make up && make test && make destroy
+#   See tests/Makefile and tests/lima.yaml
+#
+# Intel Mac / Linux / CI: use this Vagrantfile
+#   vagrant up --provider=qemu    (or virtualbox)
 
 Vagrant.configure("2") do |config|
   config.vm.box = "generic/ubuntu2204"

@@ -25,14 +25,21 @@ Minecraft Bedrock Dedicated Server management system for home Linux servers. Pro
 
 ## Testing
 
+Apple Silicon (Lima — fast, ~20s boot with Rosetta for x86_64):
+```bash
+brew install lima
+cd tests && make up && make test && make destroy
+```
+
+Intel / Linux / CI (Vagrant):
 ```bash
 cd tests
-vagrant up
+vagrant up --provider=qemu
 vagrant ssh -c "sudo /vagrant/tests/run_tests.sh"
 vagrant destroy
 ```
 
-Tests cover: installation, systemd service lifecycle, backup creation/rotation, and update URL extraction.
+28 tests covering: installation, systemd service lifecycle, server startup log, backup/restore, offsite rclone sync, and update URL extraction.
 
 ## Releasing
 

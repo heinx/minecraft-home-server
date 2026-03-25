@@ -1,0 +1,30 @@
+# Lima VM for Minecraft Bedrock server tests on Apple Silicon.
+# Uses Apple Virtualization.framework + Rosetta 2 for fast x86_64 binary support.
+#
+# Do not use directly — use the Makefile: make up / make test / make destroy
+
+vmType: "vz"
+
+images:
+  - location: "https://cloud-images.ubuntu.com/releases/22.04/release/ubuntu-22.04-server-cloudimg-arm64.img"
+    arch: "aarch64"
+
+cpus: 2
+memory: "2GiB"
+disk: "10GiB"
+
+vmOpts:
+  vz:
+    rosetta:
+      enabled: true
+      binfmt: true
+
+# Skip containerd/nerdctl (not needed, slow to install)
+containerd:
+  system: false
+  user: false
+
+mountType: "virtiofs"
+mounts:
+  - location: "~"
+    writable: true
