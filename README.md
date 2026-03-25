@@ -75,7 +75,9 @@ IMPORT_WORLD="/path/to/your/world"           # directory or .zip
 IMPORT_SERVER_PROPERTIES="/path/to/server.properties"  # optional
 ```
 
-## Offsite backup to Google Drive
+## Post-install: Offsite backup to Google Drive
+
+These steps require the `minecraft` service user, which is created by `install.sh`. Run them after installation.
 
 Backups can be automatically synced to Google Drive (or any [rclone remote](https://rclone.org/overview/)) for protection against disk failure.
 
@@ -92,6 +94,9 @@ Backups can be automatically synced to Google Drive (or any [rclone remote](http
 
 3. Enable offsite backup in `config.env`:
    ```bash
+   sudo nano /opt/minecraft-bedrock/config.env
+   ```
+   ```bash
    OFFSITE_BACKUP_ENABLED=true
    OFFSITE_BACKUP_REMOTE="gdrive:minecraft-backups"
    ```
@@ -104,7 +109,9 @@ Backups can be automatically synced to Google Drive (or any [rclone remote](http
 
 Backups sync automatically on the nightly schedule. Failures are reported via email if notifications are configured.
 
-## Email notifications
+## Post-install: Email notifications
+
+These steps can be done at any time after installation.
 
 Get notified when a backup fails, an update fails, or the server can't start. Requires a mail transport agent on the server — `msmtp` is recommended.
 
@@ -130,6 +137,9 @@ Get notified when a backup fails, an update fails, or the server can't start. Re
    For Gmail, use an [App Password](https://support.google.com/accounts/answer/185833) (not your regular password).
 
 3. Enable notifications in `config.env`:
+   ```bash
+   sudo nano /opt/minecraft-bedrock/config.env
+   ```
    ```bash
    NOTIFY_ENABLED=true
    NOTIFY_EMAIL="your-email@gmail.com"
