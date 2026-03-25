@@ -9,7 +9,7 @@
 #   make ssh      # SSH into VM
 #   make halt     # Stop VM (preserves state)
 #   make destroy  # Remove VM entirely
-#   make retest   # Sync + re-run tests (no rebuild)
+#   make retest   # Re-run tests without rebuilding VM
 
 LIMA_INSTANCE := minecraft-test
 LIMA_CONFIG   := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))lima.yaml
@@ -22,10 +22,11 @@ up:
 		echo "Instance '$(LIMA_INSTANCE)' exists, starting..."; \
 		limactl start $(LIMA_INSTANCE) 2>/dev/null || true; \
 	else \
-		limactl create --name=$(LIMA_INSTANCE) $(LIMA_CONFIG); \
+		limactl create --name=$(LIMA_INSTANCE) \
+			--set '.mounts = [{"location": "$(REPO_ROOT)", "mountPoint": "/vagrant", "writable": true}]' \
+			$(LIMA_CONFIG); \
 		limactl start $(LIMA_INSTANCE); \
 	fi
-	limactl shell $(LIMA_INSTANCE) -- sudo ln -sfn $(REPO_ROOT) /vagrant
 	limactl shell $(LIMA_INSTANCE) -- sudo bash /vagrant/tests/provision_lima.sh
 
 ssh:

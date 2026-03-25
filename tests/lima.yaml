@@ -24,7 +24,7 @@ containerd:
   system: false
   user: false
 
+# Only mount the project directory, not the entire home.
+# The Makefile passes the actual repo root path via the symlink.
 mountType: "virtiofs"
-mounts:
-  - location: "~"
-    writable: true
+mounts: []
