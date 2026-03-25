@@ -27,16 +27,16 @@ up:
 			$(LIMA_CONFIG); \
 		limactl start $(LIMA_INSTANCE); \
 	fi
-	limactl shell $(LIMA_INSTANCE) -- sudo bash /vagrant/tests/provision_lima.sh
+	limactl shell --workdir /vagrant $(LIMA_INSTANCE) -- sudo bash /vagrant/tests/provision_lima.sh
 
 ssh:
-	limactl shell $(LIMA_INSTANCE)
+	limactl shell --workdir /vagrant $(LIMA_INSTANCE)
 
 test: up
-	limactl shell $(LIMA_INSTANCE) -- sudo /vagrant/tests/run_tests.sh
+	limactl shell --workdir /vagrant $(LIMA_INSTANCE) -- sudo /vagrant/tests/run_tests.sh
 
 retest:
-	limactl shell $(LIMA_INSTANCE) -- sudo /vagrant/tests/run_tests.sh
+	limactl shell --workdir /vagrant $(LIMA_INSTANCE) -- sudo /vagrant/tests/run_tests.sh
 
 halt:
 	limactl stop $(LIMA_INSTANCE)
