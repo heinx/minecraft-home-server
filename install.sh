@@ -184,7 +184,7 @@ log_info "  Service user:   ${SERVICE_USER}:${SERVICE_GROUP}"
 
 if ! id "$SERVICE_USER" &>/dev/null; then
   log_info "Creating system user '${SERVICE_USER}'"
-  useradd --system --no-create-home --shell /usr/sbin/nologin "$SERVICE_USER"
+  useradd --system --create-home --home-dir "/home/${SERVICE_USER}" --shell /usr/sbin/nologin "$SERVICE_USER"
 else
   log_info "User '${SERVICE_USER}' already exists"
 fi
