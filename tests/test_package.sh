@@ -72,9 +72,9 @@ else
   test_pass
 fi
 
-# --- Test: tarball does NOT contain test files or mine/ ---
+# --- Test: tarball does NOT contain dev files ---
 
-test_start "tarball excludes tests"
+test_start "tarball excludes dev files"
 leaked=""
 for excluded in tests/ .git/ .github/ AGENTS.md; do
   if tar -tzf "${WORK_DIR}/${TARBALL}" | grep -q "$excluded"; then

@@ -3,8 +3,6 @@
 *.debug
 bedrock_server
 
-# World data (large LevelDB files)
-
 # Logs
 *.log
 
