@@ -107,7 +107,6 @@ test_scripts=(
   "${TESTS_DIR}/test_install.sh"
   "${TESTS_DIR}/test_service.sh"
   "${TESTS_DIR}/test_backup.sh"
-  "${TESTS_DIR}/test_offsite_backup.sh"
   "${TESTS_DIR}/test_restore.sh"
   "${TESTS_DIR}/test_update.sh"
 )

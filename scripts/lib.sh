@@ -68,6 +68,25 @@ ${body}"
   log_warn "No mail transport available (tried msmtp, sendmail, mail). Notification skipped."
 }
 
+validate_download_url() {
+  local url="$1"
+
+  # Must be HTTPS from minecraft.net
+  if [[ ! "$url" =~ ^https://(www\.)?minecraft\.net/ ]]; then
+    log_error "Download URL is not from minecraft.net: ${url}"
+    return 1
+  fi
+
+  # Filename must match bedrock-server-<version>.zip
+  local filename="${url##*/}"
+  if [[ ! "$filename" =~ ^bedrock-server-[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+\.zip$ ]]; then
+    log_error "Download filename does not match expected pattern: ${filename}"
+    return 1
+  fi
+
+  return 0
+}
+
 check_dependencies() {
   local missing=()
   for cmd in screen unzip zip curl; do

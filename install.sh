@@ -116,8 +116,6 @@ load_defaults() {
   SERVICE_GROUP="${SERVICE_GROUP:-minecraft}"
   BACKUP_KEEP_COUNT="${BACKUP_KEEP_COUNT:-20}"
   BACKUP_CRON="${BACKUP_CRON:-15 3 * * *}"
-  OFFSITE_BACKUP_ENABLED="${OFFSITE_BACKUP_ENABLED:-false}"
-  OFFSITE_BACKUP_REMOTE="${OFFSITE_BACKUP_REMOTE:-}"
   UPDATE_ENABLED="${UPDATE_ENABLED:-true}"
   UPDATE_CRON="${UPDATE_CRON:-15 4 * * *}"
   NOTIFY_ENABLED="${NOTIFY_ENABLED:-false}"
@@ -250,9 +248,6 @@ SERVICE_GROUP="${SERVICE_GROUP}"
 BACKUP_KEEP_COUNT=${BACKUP_KEEP_COUNT}
 BACKUP_CRON="${BACKUP_CRON}"
 
-# Offsite backup via rclone (optional)
-OFFSITE_BACKUP_ENABLED=${OFFSITE_BACKUP_ENABLED}
-OFFSITE_BACKUP_REMOTE="${OFFSITE_BACKUP_REMOTE}"
 
 # --- Auto-Update ---
 UPDATE_ENABLED=${UPDATE_ENABLED}
@@ -284,6 +279,17 @@ fi
 
 if [[ -z "$DOWNLOAD_URL" ]]; then
   log_error "Could not extract Bedrock Linux server URL from API response"
+  exit 1
+fi
+
+# Validate URL origin and filename pattern
+if [[ ! "$DOWNLOAD_URL" =~ ^https://(www\.)?minecraft\.net/ ]]; then
+  log_error "Download URL is not from minecraft.net: ${DOWNLOAD_URL}"
+  exit 1
+fi
+FILENAME_CHECK="${DOWNLOAD_URL##*/}"
+if [[ ! "$FILENAME_CHECK" =~ ^bedrock-server-[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+\.zip$ ]]; then
+  log_error "Download filename does not match expected pattern: ${FILENAME_CHECK}"
   exit 1
 fi
 

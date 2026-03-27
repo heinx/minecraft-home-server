@@ -10,7 +10,7 @@ Ubuntu server with:
 sudo apt-get install curl unzip zip screen
 ```
 
-Optional: `jq` (better update URL parsing), `rclone` (offsite backups), `msmtp` (email notifications).
+Optional: `jq` (better update URL parsing), `msmtp` (email notifications).
 
 ## Quick Install
 
@@ -62,7 +62,6 @@ sudo ./install.sh --config /path/to/config.env
 
 - Runs Bedrock Dedicated Server as a systemd service (auto-start on boot, auto-restart on crash)
 - Nightly world backups with configurable retention (default: 20)
-- Optional offsite backup to Google Drive (or any rclone remote)
 - Automatic server updates via [Microsoft's Minecraft services API](https://net-secondary.web.minecraft-services.net/api/v1.0/download/links) (`minecraft-services.net` — registered to Microsoft Corporation, TLS certificate issued by Microsoft CA)
 - Email notifications on failures (update, backup, or server crash)
 
@@ -74,40 +73,6 @@ Set these in your `config.env` before installing:
 IMPORT_WORLD="/path/to/your/world"           # directory or .zip
 IMPORT_SERVER_PROPERTIES="/path/to/server.properties"  # optional
 ```
-
-## Post-install: Offsite backup to Google Drive
-
-These steps require the `minecraft` service user, which is created by `install.sh`. Run them after installation.
-
-Backups can be automatically synced to Google Drive (or any [rclone remote](https://rclone.org/overview/)) for protection against disk failure.
-
-1. Install rclone:
-   ```bash
-   curl -sfL https://rclone.org/install.sh | sudo bash
-   ```
-
-2. Configure a Google Drive remote (run as the minecraft service user):
-   ```bash
-   sudo -u minecraft rclone config
-   ```
-   Follow the prompts: choose `drive` as the storage type, name it e.g. `gdrive`, and complete the OAuth flow. See [rclone Google Drive docs](https://rclone.org/drive/) for details.
-
-3. Enable offsite backup in `config.env`:
-   ```bash
-   sudo nano /opt/minecraft-bedrock/config.env
-   ```
-   ```bash
-   OFFSITE_BACKUP_ENABLED=true
-   OFFSITE_BACKUP_REMOTE="gdrive:minecraft-backups"
-   ```
-
-4. Test it manually:
-   ```bash
-   sudo -u minecraft /opt/minecraft-bedrock/scripts/backup.sh
-   rclone ls gdrive:minecraft-backups
-   ```
-
-Backups sync automatically on the nightly schedule. Failures are reported via email if notifications are configured.
 
 ## Post-install: Email notifications
 
@@ -170,14 +135,6 @@ To: your-email@gmail.com
 Failed to zip world 'MyWorld'
 ```
 
-```
-Subject: Minecraft Offsite Backup Failed
-From: minecraft-server@your-hostname
-To: your-email@gmail.com
-
-rclone sync to gdrive:minecraft-backups failed
-```
-
 ## Logs
 
 Server and management logs are in `INSTALL_DIR/logs/`:
@@ -226,8 +183,6 @@ Key settings:
 | `BACKUP_KEEP_COUNT` | `20` | Number of backups to retain |
 | `BACKUP_CRON` | `15 3 * * *` | Backup schedule (cron syntax) |
 | `UPDATE_CRON` | `15 4 * * *` | Update check schedule |
-| `OFFSITE_BACKUP_ENABLED` | `false` | Enable rclone offsite sync |
-| `OFFSITE_BACKUP_REMOTE` | | rclone remote path (e.g., `gdrive:minecraft-backups`) |
 | `NOTIFY_ENABLED` | `false` | Enable email notifications |
 | `NOTIFY_EMAIL` | | Email address for notifications |
 

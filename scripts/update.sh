@@ -34,6 +34,12 @@ fetch_download_url() {
 
 log_info "Checking for Bedrock server updates"
 DOWNLOAD_URL="$(fetch_download_url)"
+
+if ! validate_download_url "$DOWNLOAD_URL"; then
+  send_notification "Minecraft Update Failed" "Download URL failed validation: ${DOWNLOAD_URL}"
+  exit 1
+fi
+
 FILENAME="${DOWNLOAD_URL##*/}"
 log_info "Latest version: ${FILENAME}"
 

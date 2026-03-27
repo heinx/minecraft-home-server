@@ -30,6 +30,51 @@ else
   fi
 fi
 
+# --- Test: download URL passes validation ---
+
+test_start "download URL is from minecraft.net with valid filename"
+if [[ -n "${url:-}" ]]; then
+  # Source lib.sh for validate_download_url
+  source /vagrant/scripts/lib.sh 2>/dev/null || source "${REPO_DIR}/scripts/lib.sh" 2>/dev/null || true
+  if declare -f validate_download_url &>/dev/null; then
+    if validate_download_url "$url" 2>/dev/null; then
+      test_pass
+    else
+      test_fail "URL failed validation: ${url}"
+    fi
+  else
+    test_fail "validate_download_url function not found in lib.sh"
+  fi
+else
+  test_fail "no URL available from previous test"
+fi
+
+# --- Test: validation rejects non-minecraft.net URLs ---
+
+test_start "URL validation rejects non-minecraft.net origin"
+if declare -f validate_download_url &>/dev/null; then
+  if validate_download_url "https://evil.com/bedrock-server-1.0.0.0.zip" 2>/dev/null; then
+    test_fail "should have rejected non-minecraft.net URL"
+  else
+    test_pass
+  fi
+else
+  test_fail "validate_download_url function not found"
+fi
+
+# --- Test: validation rejects bad filename ---
+
+test_start "URL validation rejects malformed filename"
+if declare -f validate_download_url &>/dev/null; then
+  if validate_download_url "https://www.minecraft.net/bedrockdedicatedserver/bin-linux/malware.exe" 2>/dev/null; then
+    test_fail "should have rejected non-matching filename"
+  else
+    test_pass
+  fi
+else
+  test_fail "validate_download_url function not found"
+fi
+
 # --- Test: already up to date exits cleanly ---
 
 test_start "update.sh exits cleanly when already up to date"

@@ -69,33 +69,7 @@ cleanup() {
   prune_old_files "server.properties.*"
 }
 
-offsite_sync() {
-  if [[ "${OFFSITE_BACKUP_ENABLED:-false}" != "true" ]]; then
-    return 0
-  fi
-
-  if [[ -z "${OFFSITE_BACKUP_REMOTE:-}" ]]; then
-    log_warn "OFFSITE_BACKUP_REMOTE not set, skipping offsite sync"
-    return 0
-  fi
-
-  if ! command -v rclone &>/dev/null; then
-    log_error "rclone not found but OFFSITE_BACKUP_ENABLED=true"
-    send_notification "Minecraft Offsite Backup Failed" "rclone is not installed"
-    return 1
-  fi
-
-  log_info "Syncing backups to ${OFFSITE_BACKUP_REMOTE}"
-  if ! rclone sync "$BACKUP_DIR" "$OFFSITE_BACKUP_REMOTE" --log-level INFO; then
-    log_error "Offsite backup sync failed"
-    send_notification "Minecraft Offsite Backup Failed" "rclone sync to ${OFFSITE_BACKUP_REMOTE} failed"
-    return 1
-  fi
-  log_info "Offsite sync complete"
-}
-
 backup
 cleanup
-offsite_sync
 
 log_info "Backup complete"
