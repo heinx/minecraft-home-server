@@ -1,6 +1,6 @@
 # AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to AI coding agents when working with code in this repository.
 
 ## Overview
 
@@ -12,13 +12,13 @@ Minecraft Bedrock Dedicated Server management system for home Linux servers. Pro
 - `templates/` - Systemd service and crontab templates with `%%VARIABLE%%` placeholders replaced at install time
 - `install.sh` - Installer that creates user, downloads Bedrock server, installs scripts/service/cron
 - `config.env.example` - Configuration template with all supported variables
-- `tests/` - Vagrant-based integration tests (Ubuntu 22.04 VM)
+- `tests/` - VM-based integration tests (Ubuntu 22.04)
 - `.github/workflows/release.yml` - Packages and releases on `v*` tag push with build provenance attestation
 
 ## Key Design Decisions
 
 - **Config-driven**: All paths, names, schedules, etc. come from `config.env` (no hardcoded values in scripts)
-- **Update URL**: Microsoft moved the Bedrock download link behind JavaScript. Scripts use the API at `https://net-secondary.web.minecraft-services.net/api/v1.0/download/links` with jq (preferred) or grep fallback
+- **Update URL**: Microsoft moved the Bedrock download link behind JavaScript. Scripts use the API at `https://net-secondary.web.minecraft-services.net/api/v1.0/download/links` with jq (preferred) or grep fallback. Download URL is validated to originate from minecraft.net.
 - **Service user**: Runs as a dedicated `minecraft` system user with sudoers entry for `systemctl stop/start/restart minecraft` only
 - **Screen session**: Server runs inside GNU screen (named `minecraft`) for console access; systemd uses `Type=forking`
 - **Backup rotation**: Keeps N most recent backups by modification time, prunes excess
@@ -39,7 +39,7 @@ vagrant ssh -c "sudo /vagrant/tests/run_tests.sh"
 vagrant destroy
 ```
 
-28 tests covering: installation, systemd service lifecycle, server startup log, backup/restore, offsite rclone sync, and update URL extraction.
+28 tests covering: installation, systemd service lifecycle, server startup log, backup/restore, and update URL extraction.
 
 ## Releasing
 
