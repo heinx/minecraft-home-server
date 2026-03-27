@@ -23,4 +23,4 @@ jobs:
         run: sudo tests/run_tests.sh
 
       - name: Run package tests
-        run: tests/test_package.sh
+        run: sudo tests/test_package.sh
