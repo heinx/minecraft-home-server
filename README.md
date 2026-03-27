@@ -117,21 +117,33 @@ Get notified when a backup fails, an update fails, or the server can't start. Re
 
 The scripts also support `sendmail` or `mail` if already configured on the system.
 
+To verify that the update cron job and email delivery are working, temporarily enable verbose update notifications:
+
+```bash
+NOTIFY_ON_UPDATE_CHECK=true
+```
+
+This sends an email on every update check (not just failures). Disable it once you've confirmed emails are arriving.
+
 Example notification emails:
 
 ```
-Subject: Minecraft Update Failed
-From: minecraft-server@your-hostname
-To: your-email@gmail.com
+Subject: Minecraft Update Successful
+Server updated to bedrock-server-1.26.10.4.zip and is running.
+```
 
+```
+Subject: Minecraft Update Check
+Server is already up to date (bedrock-server-1.26.10.4.zip)
+```
+
+```
+Subject: Minecraft Update Failed
 Server did not start after updating to bedrock-server-1.26.10.4.zip
 ```
 
 ```
 Subject: Minecraft Backup Failed
-From: minecraft-server@your-hostname
-To: your-email@gmail.com
-
 Failed to zip world 'MyWorld'
 ```
 
@@ -185,6 +197,7 @@ Key settings:
 | `UPDATE_CRON` | `15 4 * * *` | Update check schedule |
 | `NOTIFY_ENABLED` | `false` | Enable email notifications |
 | `NOTIFY_EMAIL` | | Email address for notifications |
+| `NOTIFY_ON_UPDATE_CHECK` | `false` | Email on every update check (for testing) |
 
 ## Manual operations
 

@@ -45,7 +45,14 @@ log_info "Latest version: ${FILENAME}"
 
 if [[ -f "${INSTALL_DIR}/${FILENAME}" ]]; then
   log_info "Already up to date"
+  if [[ "${NOTIFY_ON_UPDATE_CHECK:-false}" == "true" ]]; then
+    send_notification "Minecraft Update Check" "Server is already up to date (${FILENAME})"
+  fi
   exit 0
+fi
+
+if [[ "${NOTIFY_ON_UPDATE_CHECK:-false}" == "true" ]]; then
+  send_notification "Minecraft Update Check" "New version available: ${FILENAME}. Updating now."
 fi
 
 log_info "Update available. Downloading ${DOWNLOAD_URL}"
@@ -89,3 +96,4 @@ if ! sudo systemctl start minecraft; then
 fi
 
 log_info "Update to ${FILENAME} complete"
+send_notification "Minecraft Update Successful" "Server updated to ${FILENAME} and is running."
