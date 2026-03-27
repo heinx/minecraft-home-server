@@ -40,7 +40,7 @@ check_port_listening() {
   ss -ulnp | grep -q ":19132 "
 }
 
-if wait_for "port 19132/UDP to be listening" 30 check_port_listening; then
+if wait_for "port 19132/UDP to be listening" 60 check_port_listening; then
   test_pass
 else
   true

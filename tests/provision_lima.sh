@@ -4,34 +4,39 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# --- Shared provisioning (same deps as Vagrant) ---
-bash "${SCRIPT_DIR}/provision.sh"
+# --- Rosetta x86_64 support (must run before apt-get update) ---
 
-# --- Rosetta x86_64 support ---
-echo "=== Configuring x86_64 (amd64) support via Rosetta ==="
+if ! dpkg --print-foreign-architectures 2>/dev/null | grep -q amd64; then
+  echo "=== Configuring x86_64 (amd64) support via Rosetta ==="
 
-dpkg --add-architecture amd64
+  dpkg --add-architecture amd64
 
-# Pin existing arm64 sources to arm64-only (ports.ubuntu.com doesn't carry amd64)
-sed -i 's/^deb http/deb [arch=arm64] http/g' /etc/apt/sources.list
-sed -i 's/^deb-src http/deb-src [arch=arm64] http/g' /etc/apt/sources.list
+  # Pin existing arm64 sources to arm64-only (ports.ubuntu.com doesn't carry amd64)
+  sed -i '/^\s*#/!s/^deb \([^[]\)/deb [arch=arm64] \1/g' /etc/apt/sources.list
+  sed -i '/^\s*#/!s/^deb-src \([^[]\)/deb-src [arch=arm64] \1/g' /etc/apt/sources.list
 
-# Add amd64 sources from archive.ubuntu.com
-cat > /etc/apt/sources.list.d/amd64.list <<'EOF'
+  # Add amd64 sources from archive.ubuntu.com
+  cat > /etc/apt/sources.list.d/amd64.list <<'EOF'
 deb [arch=amd64] http://archive.ubuntu.com/ubuntu jammy main restricted universe multiverse
 deb [arch=amd64] http://archive.ubuntu.com/ubuntu jammy-updates main restricted universe multiverse
 deb [arch=amd64] http://archive.ubuntu.com/ubuntu jammy-security main restricted universe multiverse
 EOF
+fi
 
-apt-get update -qq
+# --- Shared provisioning (same deps as Vagrant) ---
+bash "${SCRIPT_DIR}/provision.sh"
 
-# x86_64 system libraries that bedrock_server dynamically links against.
-# The server bundles most .so files, but needs these base system libs.
-apt-get install -y -qq \
-  libc6:amd64 \
-  libstdc++6:amd64 \
-  libcurl4:amd64 \
-  libssl3:amd64
+# --- Install x86_64 system libraries ---
+
+if ! dpkg -l libc6:amd64 &>/dev/null; then
+  echo "=== Installing x86_64 libraries ==="
+  # bedrock_server bundles most .so files, but needs these base system libs.
+  apt-get install -y -qq \
+    libc6:amd64 \
+    libstdc++6:amd64 \
+    libcurl4:amd64 \
+    libssl3:amd64
+fi
 
 echo "=== Verifying Rosetta ==="
 if [[ -f /proc/sys/fs/binfmt_misc/rosetta ]]; then
