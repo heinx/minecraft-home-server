@@ -147,6 +147,48 @@ Subject: Minecraft Backup Failed
 Failed to zip world 'MyWorld'
 ```
 
+## Post-install: Cloud backups (Google Drive)
+
+Back up your world to Google Drive automatically after each local backup. Uses [rclone](https://rclone.org/) with a tiered retention policy so you have daily snapshots for the past week and progressively fewer older backups going back years.
+
+### Setup
+
+```bash
+sudo /opt/minecraft-bedrock/scripts/cloud-backup-setup.sh
+```
+
+The script installs rclone (if needed), opens a Google authorization page in your browser, tests the connection, and enables cloud backups. On a headless server it provides a URL to open on another machine.
+
+### How it works
+
+After each nightly local backup, `backup.sh` uploads the world zip and server.properties to a folder on your Google Drive. Old cloud backups are thinned automatically:
+
+| Age | Kept |
+|-----|------|
+| Past 7 days | Every daily backup |
+| 1-4 weeks | ~2 per week |
+| 1-12 months | 1 per month |
+| 1-10 years | 1 every 6 months |
+| Over 10 years | Deleted |
+
+If the cloud upload fails (network down, Drive full, token expired), the local backup still completes normally and an email notification is sent (if enabled).
+
+### What rclone can access on your Google Drive
+
+rclone uses the `drive.file` scope, which means it can **only** access files and folders that it created. It cannot see, read, or modify any of your personal Google Drive files. The authorization uses rclone's own built-in OAuth credentials — you do not need to create a Google Cloud project or manage API keys.
+
+The OAuth token is stored at `INSTALL_DIR/.rclone.conf` with permissions restricted to the minecraft service user (chmod 600). You can revoke access at any time from [Google Account > Third-party apps](https://myaccount.google.com/permissions).
+
+### Configuration
+
+```bash
+CLOUD_BACKUP_ENABLED=true                 # Enable/disable cloud backups
+CLOUD_BACKUP_REMOTE="gdrive"              # rclone remote name
+CLOUD_BACKUP_FOLDER="minecraft-backups"   # Folder name on Google Drive
+```
+
+To disable: set `CLOUD_BACKUP_ENABLED=false` in `config.env`. To re-authorize: re-run the setup script.
+
 ## Logs
 
 Server and management logs are in `INSTALL_DIR/logs/`:
@@ -198,6 +240,9 @@ Key settings:
 | `NOTIFY_ENABLED` | `false` | Enable email notifications |
 | `NOTIFY_EMAIL` | | Email address for notifications |
 | `NOTIFY_ON_UPDATE_CHECK` | `false` | Email on every update check (for testing) |
+| `CLOUD_BACKUP_ENABLED` | `false` | Enable Google Drive cloud backups |
+| `CLOUD_BACKUP_REMOTE` | | rclone remote name (set by setup script) |
+| `CLOUD_BACKUP_FOLDER` | `minecraft-backups` | Folder name on Google Drive |
 
 ## Manual operations
 
@@ -224,7 +269,9 @@ sudo /opt/minecraft-bedrock/scripts/restore.sh /opt/minecraft-bedrock/backups/wo
     lib.sh                        # Shared functions (logging, config, notifications)
     start.sh                      # Start server in screen session
     stop.sh                       # Graceful stop via screen
-    backup.sh                     # World backup + rotation + offsite sync
+    backup.sh                     # World backup + rotation + cloud sync
+    cloud-backup.sh               # Google Drive upload + retention
+    cloud-backup-setup.sh         # Interactive cloud backup setup
     update.sh                     # Auto-update from Microsoft API
     restore.sh                    # Restore world from backup
   logs/                           # server.log, backup.log, update.log

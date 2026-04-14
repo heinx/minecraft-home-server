@@ -72,4 +72,10 @@ cleanup() {
 backup
 cleanup
 
+# Cloud backup (if enabled). Failures are logged but never fail the local backup.
+source "${SCRIPT_DIR}/cloud-backup.sh"
+if [[ "${CLOUD_BACKUP_ENABLED:-false}" == "true" ]]; then
+  cloud_backup || true
+fi
+
 log_info "Backup complete"
