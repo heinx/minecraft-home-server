@@ -136,39 +136,79 @@ prompt_value() {
   fi
 }
 
-if [[ -n "$CONFIG_FILE" ]]; then
-  if [[ ! -f "$CONFIG_FILE" ]]; then
-    log_error "Config file not found: ${CONFIG_FILE}"
-    exit 1
-  fi
-  log_info "Loading configuration from ${CONFIG_FILE}"
+# --- Detect existing installation ---
+
+UPGRADE=false
+
+# Determine INSTALL_DIR to check (from --config, env, or default)
+if [[ -n "$CONFIG_FILE" && -f "$CONFIG_FILE" ]]; then
   # shellcheck source=/dev/null
   source "$CONFIG_FILE"
-  load_defaults
-elif [[ -t 0 ]]; then
-  # Interactive terminal - prompt for values
-  log_info "Interactive configuration (press Enter to accept defaults)"
-  echo ""
+fi
+_CHECK_DIR="${INSTALL_DIR:-/opt/minecraft-bedrock}"
+
+if [[ -f "${_CHECK_DIR}/config.env" && -f "${_CHECK_DIR}/bedrock_server" ]]; then
+  # Load existing config to show details and use as defaults
+  # shellcheck source=/dev/null
+  source "${_CHECK_DIR}/config.env"
   load_defaults
 
-  prompt_value SERVER_NAME       "Server name"         "$SERVER_NAME"
-  prompt_value WORLD_NAME        "World name"          "$WORLD_NAME"
-  prompt_value GAMEMODE          "Game mode"            "$GAMEMODE"
-  prompt_value DIFFICULTY        "Difficulty"           "$DIFFICULTY"
-  prompt_value MAX_PLAYERS       "Max players"          "$MAX_PLAYERS"
-  prompt_value SERVER_PORT       "Server port"          "$SERVER_PORT"
-  prompt_value INSTALL_DIR       "Install directory"    "$INSTALL_DIR"
-  prompt_value BACKUP_DIR        "Backup directory"     "$BACKUP_DIR"
-  prompt_value SERVICE_USER      "Service user"         "$SERVICE_USER"
-  prompt_value SERVICE_GROUP     "Service group"        "$SERVICE_GROUP"
-  prompt_value IMPORT_WORLD      "Import world (path to dir or zip, blank to skip)" "$IMPORT_WORLD"
-  prompt_value IMPORT_SERVER_PROPERTIES "Import server.properties (path, blank to skip)" "$IMPORT_SERVER_PROPERTIES"
+  if [[ -t 0 ]]; then
+    echo ""
+    log_info "Existing installation found at ${INSTALL_DIR}"
+    log_info "  Server: ${SERVER_NAME}"
+    log_info "  World:  ${WORLD_NAME}"
+    echo ""
+    read -rp "Update management scripts only? (keeps server, world, config) [Y/n]: " upgrade_choice
+    upgrade_choice="${upgrade_choice:-Y}"
+    if [[ "$upgrade_choice" =~ ^[Yy] ]]; then
+      UPGRADE=true
+    fi
+    echo ""
+  else
+    # Non-interactive with existing install: upgrade by default
+    log_info "Existing installation found at ${INSTALL_DIR}, upgrading management scripts"
+    UPGRADE=true
+  fi
+fi
 
-  echo ""
-else
-  # Non-interactive (piped) - use defaults
-  log_info "Non-interactive mode, using default configuration"
-  load_defaults
+# --- Fresh install: load or prompt for configuration ---
+
+if [[ "$UPGRADE" == "false" ]]; then
+  if [[ -n "$CONFIG_FILE" ]]; then
+    if [[ ! -f "$CONFIG_FILE" ]]; then
+      log_error "Config file not found: ${CONFIG_FILE}"
+      exit 1
+    fi
+    log_info "Loading configuration from ${CONFIG_FILE}"
+    # shellcheck source=/dev/null
+    source "$CONFIG_FILE"
+    load_defaults
+  elif [[ -t 0 ]]; then
+    # Interactive terminal - prompt for values
+    log_info "Interactive configuration (press Enter to accept defaults)"
+    echo ""
+    load_defaults
+
+    prompt_value SERVER_NAME       "Server name"         "$SERVER_NAME"
+    prompt_value WORLD_NAME        "World name"          "$WORLD_NAME"
+    prompt_value GAMEMODE          "Game mode"            "$GAMEMODE"
+    prompt_value DIFFICULTY        "Difficulty"           "$DIFFICULTY"
+    prompt_value MAX_PLAYERS       "Max players"          "$MAX_PLAYERS"
+    prompt_value SERVER_PORT       "Server port"          "$SERVER_PORT"
+    prompt_value INSTALL_DIR       "Install directory"    "$INSTALL_DIR"
+    prompt_value BACKUP_DIR        "Backup directory"     "$BACKUP_DIR"
+    prompt_value SERVICE_USER      "Service user"         "$SERVICE_USER"
+    prompt_value SERVICE_GROUP     "Service group"        "$SERVICE_GROUP"
+    prompt_value IMPORT_WORLD      "Import world (path to dir or zip, blank to skip)" "$IMPORT_WORLD"
+    prompt_value IMPORT_SERVER_PROPERTIES "Import server.properties (path, blank to skip)" "$IMPORT_SERVER_PROPERTIES"
+
+    echo ""
+  else
+    # Non-interactive (piped) - use defaults
+    log_info "Non-interactive mode, using default configuration"
+    load_defaults
+  fi
 fi
 
 log_info "Configuration:"
@@ -214,6 +254,11 @@ mkdir -p "${BACKUP_DIR}"
 log_info "Installing management scripts to ${INSTALL_DIR}/scripts/"
 cp -f "${SCRIPT_DIR}/scripts/"*.sh "${INSTALL_DIR}/scripts/"
 chmod +x "${INSTALL_DIR}/scripts/"*.sh
+
+# Steps 4-8 are only needed for fresh installs.
+# Upgrades keep existing config, server binary, server.properties, and world.
+
+if [[ "$UPGRADE" == "false" ]]; then
 
 # --- Step 4: Write config.env ---
 
@@ -374,6 +419,10 @@ if [[ -n "$IMPORT_WORLD" ]]; then
   log_info "World imported to ${WORLD_DEST}"
 fi
 
+else
+  log_info "Upgrade: keeping existing config, server, and world data"
+fi
+
 # --- Step 10: Process templates ---
 
 process_template() {
@@ -421,17 +470,30 @@ chown -R "${SERVICE_USER}:${SERVICE_GROUP}" "${BACKUP_DIR}"
 
 # --- Step 12: Enable and start service ---
 
-log_info "Enabling and starting minecraft service"
 systemctl daemon-reload
 systemctl enable minecraft
-systemctl start minecraft
+
+if [[ "$UPGRADE" == "true" ]]; then
+  log_info "Restarting minecraft service"
+  systemctl restart minecraft
+else
+  log_info "Starting minecraft service"
+  systemctl start minecraft
+fi
 
 # --- Step 13: Success ---
 
-echo ""
-echo "======================================"
-echo "  Minecraft Bedrock Server installed"
-echo "======================================"
+if [[ "$UPGRADE" == "true" ]]; then
+  echo ""
+  echo "======================================"
+  echo "  Management scripts updated"
+  echo "======================================"
+else
+  echo ""
+  echo "======================================"
+  echo "  Minecraft Bedrock Server installed"
+  echo "======================================"
+fi
 echo ""
 echo "  Server name:  ${SERVER_NAME}"
 echo "  World name:   ${WORLD_NAME}"
