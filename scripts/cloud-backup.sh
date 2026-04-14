@@ -35,7 +35,8 @@ parse_backup_epoch() {
 # --- Retention policy ---
 
 # Determine which retention bucket a backup belongs to based on its age.
-# Prints a bucket key (e.g. "d3", "w1", "m5") or "expired".
+# Prints a bucket key (e.g. "d3", "w1", "m5", "h0", "y0").
+# Every backup fits a bucket — nothing is expired.
 # Usage: retention_bucket <age_in_seconds>
 retention_bucket() {
   local age_secs="$1"
@@ -60,8 +61,9 @@ retention_bucket() {
     local offset=$(( (age_days - 365) / 182 ))
     echo "h${offset}"
   else
-    # Older than 10 years — mark for deletion
-    echo "expired"
+    # Tier 5: yearly for 10+ years — bucket every ~365 days
+    local offset=$(( (age_days - 3650) / 365 ))
+    echo "y${offset}"
   fi
 }
 
@@ -102,9 +104,7 @@ compute_cloud_retention() {
   local prev_bucket=""
   while IFS=';' read -r bucket epoch filename; do
     [[ -z "$bucket" ]] && continue
-    if [[ "$bucket" == "expired" ]]; then
-      echo "$filename"
-    elif [[ "$bucket" != "$prev_bucket" ]]; then
+    if [[ "$bucket" != "$prev_bucket" ]]; then
       # Newest entry for this bucket — keep it
       prev_bucket="$bucket"
     else
