@@ -169,7 +169,7 @@ After each nightly local backup, `backup.sh` uploads the world zip and server.pr
 | 1-4 weeks | ~2 per week |
 | 1-12 months | 1 per month |
 | 1-10 years | 1 every 6 months |
-| Over 10 years | Deleted |
+| 10+ years | 1 per year |
 
 If the cloud upload fails (network down, Drive full, token expired), the local backup still completes normally and an email notification is sent (if enabled).
 

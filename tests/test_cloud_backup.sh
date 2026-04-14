@@ -96,16 +96,21 @@ else
   test_fail "expected 16-19 kept (semi-annual buckets), got ${keep_count}"
 fi
 
-# --- Test: delete everything older than 10 years ---
+# --- Test: yearly retention for 10+ years ---
 
-test_start "retention: deletes backups older than 10 years"
-input="$(make_retention_input "world" 3650 3700 4000 5000)"
+test_start "retention: keeps yearly for 10+ year old backups"
+# Generate one backup every 180 days from day 3650 to 5110 (9 files spanning ~4 years)
+ages=()
+for d in $(seq 3650 180 5110); do ages+=("$d"); done
+input="$(make_retention_input "world" "${ages[@]}")"
 deleted="$(echo "$input" | compute_cloud_retention)"
 delete_count=$(count_lines "$deleted")
-if [[ $delete_count -eq 4 ]]; then
+keep_count=$((${#ages[@]} - delete_count))
+# 9 files over ~1460 days (4 years), yearly buckets → ~4-5 kept
+if [[ $keep_count -ge 3 && $keep_count -le 5 ]]; then
   test_pass
 else
-  test_fail "expected all 4 deleted, got ${delete_count}"
+  test_fail "expected 3-5 kept (yearly buckets), got ${keep_count}"
 fi
 
 # --- Test: mixed tiers realistic scenario ---
