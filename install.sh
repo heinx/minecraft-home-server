@@ -363,7 +363,6 @@ unzip -o "${INSTALL_DIR}/${SERVER_ZIP}" -d "${INSTALL_DIR}" > /dev/null
 # --- Step 7: Generate server.properties ---
 
 if [[ -n "$IMPORT_SERVER_PROPERTIES" ]]; then
-  # Step 9 (handled here): import existing server.properties
   if [[ ! -f "$IMPORT_SERVER_PROPERTIES" ]]; then
     log_error "Import server.properties not found: ${IMPORT_SERVER_PROPERTIES}"
     exit 1
