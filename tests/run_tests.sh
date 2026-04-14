@@ -110,6 +110,7 @@ test_scripts=(
   "${TESTS_DIR}/test_backup.sh"
   "${TESTS_DIR}/test_restore.sh"
   "${TESTS_DIR}/test_update.sh"
+  "${TESTS_DIR}/test_cloud_backup.sh"
 )
 
 for script in "${test_scripts[@]}"; do
