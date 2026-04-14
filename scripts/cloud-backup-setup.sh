@@ -94,7 +94,7 @@ echo "A browser window will open (or a URL will be shown) for you to"
 echo "grant access to Google Drive with the 'drive.file' scope."
 echo ""
 
-# Detect if we can open a browser
+# Detect if we can open a browser locally
 is_headless=true
 if [[ -n "${DISPLAY:-}" || -n "${WAYLAND_DISPLAY:-}" ]]; then
   if [[ -z "${SSH_CONNECTION:-}" ]]; then
@@ -102,22 +102,21 @@ if [[ -n "${DISPLAY:-}" || -n "${WAYLAND_DISPLAY:-}" ]]; then
   fi
 fi
 
-# Create the remote config entry
-rclone config create "$REMOTE_NAME" drive \
-  scope drive.file \
-  --config "$RCLONE_CONF" \
-  --non-interactive 2>/dev/null || true
-
 if [[ "$is_headless" == "false" ]]; then
-  # Desktop: direct browser authorization
+  # Desktop: rclone handles the full browser auth flow
+  rclone config create "$REMOTE_NAME" drive \
+    scope drive.file \
+    --config "$RCLONE_CONF" \
+    --non-interactive 2>/dev/null || true
+
   echo "Opening browser for authorization..."
   echo ""
   rclone config reconnect "${REMOTE_NAME}:" --config "$RCLONE_CONF"
 else
-  # Headless: manual token flow
+  # Headless: get token from another machine, write config directly
   echo "This appears to be a headless server (no display detected)."
   echo ""
-  echo "To authorize, run this command on a computer with a web browser:"
+  echo "On a computer with a web browser, install rclone and run:"
   echo ""
   echo "  rclone authorize \"drive\" --drive-scope \"drive.file\""
   echo ""
@@ -131,8 +130,13 @@ else
     exit 1
   fi
 
-  # Update the remote config with the token
-  rclone config update "$REMOTE_NAME" token "$token_json" --config "$RCLONE_CONF"
+  # Write rclone config directly to avoid triggering any auth flow
+  cat > "$RCLONE_CONF" <<RCLONEEOF
+[${REMOTE_NAME}]
+type = drive
+scope = drive.file
+token = ${token_json}
+RCLONEEOF
 fi
 
 # --- Step 5: Set permissions on rclone config ---
