@@ -120,6 +120,9 @@ load_defaults() {
   UPDATE_CRON="${UPDATE_CRON:-15 4 * * *}"
   NOTIFY_ENABLED="${NOTIFY_ENABLED:-false}"
   NOTIFY_EMAIL="${NOTIFY_EMAIL:-}"
+  CLOUD_BACKUP_ENABLED="${CLOUD_BACKUP_ENABLED:-false}"
+  CLOUD_BACKUP_REMOTE="${CLOUD_BACKUP_REMOTE:-}"
+  CLOUD_BACKUP_FOLDER="${CLOUD_BACKUP_FOLDER:-minecraft-backups}"
   IMPORT_WORLD="${IMPORT_WORLD:-}"
   IMPORT_SERVER_PROPERTIES="${IMPORT_SERVER_PROPERTIES:-}"
 }
@@ -298,6 +301,11 @@ BACKUP_CRON="${BACKUP_CRON}"
 UPDATE_ENABLED=${UPDATE_ENABLED}
 UPDATE_CRON="${UPDATE_CRON}"
 
+# --- Cloud Backup (optional) ---
+CLOUD_BACKUP_ENABLED=${CLOUD_BACKUP_ENABLED}
+CLOUD_BACKUP_REMOTE="${CLOUD_BACKUP_REMOTE}"
+CLOUD_BACKUP_FOLDER="${CLOUD_BACKUP_FOLDER}"
+
 # --- Email Notifications (optional) ---
 NOTIFY_ENABLED=${NOTIFY_ENABLED}
 NOTIFY_EMAIL="${NOTIFY_EMAIL}"
@@ -355,7 +363,6 @@ unzip -o "${INSTALL_DIR}/${SERVER_ZIP}" -d "${INSTALL_DIR}" > /dev/null
 # --- Step 7: Generate server.properties ---
 
 if [[ -n "$IMPORT_SERVER_PROPERTIES" ]]; then
-  # Step 9 (handled here): import existing server.properties
   if [[ ! -f "$IMPORT_SERVER_PROPERTIES" ]]; then
     log_error "Import server.properties not found: ${IMPORT_SERVER_PROPERTIES}"
     exit 1
@@ -514,6 +521,8 @@ echo ""
 echo "  Server console:"
 echo "    sudo -u ${SERVICE_USER} screen -r minecraft"
 echo "    (detach with Ctrl-A, D)"
+echo ""
+echo "  Cloud backups: sudo ${INSTALL_DIR}/scripts/cloud-backup-setup.sh"
 echo ""
 echo "  Configuration: ${INSTALL_DIR}/config.env"
 echo "  Logs:          ${INSTALL_DIR}/logs/"

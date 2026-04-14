@@ -18,6 +18,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq curl unzip screen jq zip
+          curl -sfL https://rclone.org/install.sh | sudo bash
 
       - name: Run test suite
         run: sudo tests/run_tests.sh

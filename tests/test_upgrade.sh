@@ -82,7 +82,7 @@ fi
 
 test_start "upgrade: management scripts are updated"
 scripts_ok=true
-for script_name in start.sh stop.sh backup.sh update.sh restore.sh lib.sh; do
+for script_name in start.sh stop.sh backup.sh update.sh restore.sh lib.sh cloud-backup.sh cloud-backup-setup.sh; do
   if [[ ! -f "${INSTALL_DIR}/scripts/${script_name}" ]]; then
     test_fail "missing script after upgrade: ${script_name}"
     scripts_ok=false
