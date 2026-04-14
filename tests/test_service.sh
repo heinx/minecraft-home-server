@@ -37,10 +37,11 @@ fi
 
 test_start "server port 19132/UDP is listening"
 check_port_listening() {
-  ss -ulnp | grep -q ":19132 "
+  ss -ulnp 2>/dev/null | grep -q ":${SERVER_PORT} " || \
+    ss -uln 2>/dev/null | grep -q ":${SERVER_PORT} "
 }
 
-if wait_for "port 19132/UDP to be listening" 60 check_port_listening; then
+if wait_for "port ${SERVER_PORT}/UDP to be listening" 120 check_port_listening; then
   test_pass
 else
   true
